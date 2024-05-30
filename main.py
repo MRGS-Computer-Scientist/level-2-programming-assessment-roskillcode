@@ -33,3 +33,31 @@ class CampusConnect:
         
         tab_control.pack(expand=1, fill='both')
         
+    def create_messaging_tab(self, tab_control):
+        tab = ttk.Frame(tab_control)
+        tab_control.add(tab, text="Messaging")
+        
+        sender_label = ttk.Label(tab, text="Sender")
+        sender_label.grid(colum=0, row= 0, padx=10, pady=10)
+        self.sender_entry = ttk.Entry(tab)
+        self.sender_entry.grid(column=1, row=0, padx=10, pady=10)
+        
+        receiver_label = ttk.Label(tab, text="Receiver: ")
+        receiver_label.grid(column=0, row=1, padx=10, pady=10)
+        self.receiver_entry = ttk.Entry(tab)
+        self.receiver_entry.grid(column=1, row=1, padx=10, pady=10)
+        
+        message_label = ttk.Label(tab, text="Message:")
+        message_label.grid(column=0, row=2, padx=10, pady=10)
+        self.message_entry = ttk.Entry(tab)
+        self.message_entry.grid(column=1, row=2, padx=10, pady=10)
+
+        send_button = ttk.Button(tab, text="Send Message", command=self.send_message)
+        send_button.grid(column=1, row=3, padx=10, pady=10)
+
+        
+
+        
+        
+            
+        
