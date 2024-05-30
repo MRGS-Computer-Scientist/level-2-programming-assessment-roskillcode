@@ -22,3 +22,14 @@ class CampusConnect:
         
         self.create_widgets()
         
+    def create_widgets(self):
+        tab_control = ttk.Notebook(self.root)
+        
+        self.create_messaging_tab(tab_control)
+        self.create_announcments_tab(tab_control)
+        self.create_forums_tab(tab_control)
+        self.create_appointments_tab(tab_control)
+        self.create_notifications_tab(tab_control)
+        
+        tab_control.pack(expand=1, fill='both')
+        
