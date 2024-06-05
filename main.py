@@ -79,6 +79,12 @@ class CampusConnect:
 
         post_button = ttk.Button(tab, text="Post Announcement", command=self.post_announcement)
         post_button.grid(column=1, row=2, padx=10, pady=10)
+        
+    def post_announcement(self):
+        sender = self.announcement_sender_entry.get()
+        announcement = self.announcement_entry.get()
+        self.announcements.post_announcement(sender, announcement)
+        messagebox.showinfo("Success", "Announcement posted!")
 
         
 
