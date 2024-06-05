@@ -132,6 +132,12 @@ class CampusConnect:
         schedule_button = ttk.Button(tab, text="Schedule Appointment", command=self.schedule_appointment)
         schedule_button.grid(column=1, row=3, padx=10, pady=10)
 
+    def schedule_appointment(self):
+        student = self.student_entry.get()
+        faculty = self.faculty_entry.get()
+        datetime = self.datetime_entry.get()
+        self.appointments.schedule_appointment(student, faculty, datetime)
+        messagebox.showinfo("Success", "Appointment scheduled!")
                     
                    
 
