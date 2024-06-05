@@ -54,7 +54,24 @@ class CampusConnect:
 
         send_button = ttk.Button(tab, text="Send Message", command=self.send_message)
         send_button.grid(column=1, row=3, padx=10, pady=10)
+        
+        def send_message(self):
+            sender = self.sender_entry.get()
+            reciver = self.receiver_entry.get()
+            message = self.message_entry.get()
+            self.messaging.send_message(sender, reciver, message)
+            messagebox.showinfo("Success", "Message sent!")
+        
+        
+            
+                   
 
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = CampusConnectApp(root)
+    root.mainloop()
         
 
         
