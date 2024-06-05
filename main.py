@@ -155,7 +155,12 @@ class CampusConnect:
 
         send_button = ttk.Button(tab, text="Send Notification", command=self.send_notification)
         send_button.grid(column=1, row=2, padx=10, pady=10)
-                    
+    
+    def send_notification(self):
+        user = self.notification_user_entry.get()
+        notification = self.notification_entry.get()
+        self.notifications.send_notification(user, notification)
+        messagebox.showinfo("Success", "Notification sent!")
                    
 
 
