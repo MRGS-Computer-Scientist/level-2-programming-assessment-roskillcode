@@ -138,6 +138,23 @@ class CampusConnect:
         datetime = self.datetime_entry.get()
         self.appointments.schedule_appointment(student, faculty, datetime)
         messagebox.showinfo("Success", "Appointment scheduled!")
+        
+    def create_notifications_tab(self, tab_control):
+        tab = ttk.Frame(tab_control)
+        tab_control.add(tab, text="Notifications")
+
+        user_label = ttk.Label(tab, text="User:")
+        user_label.grid(column=0, row=0, padx=10, pady=10)
+        self.notification_user_entry = ttk.Entry(tab)
+        self.notification_user_entry.grid(column=1, row=0, padx=10, pady=10)
+
+        notification_label = ttk.Label(tab, text="Notification:")
+        notification_label.grid(column=0, row=1, padx=10, pady=10)
+        self.notification_entry = ttk.Entry(tab)
+        self.notification_entry.grid(column=1, row=1, padx=10, pady=10)
+
+        send_button = ttk.Button(tab, text="Send Notification", command=self.send_notification)
+        send_button.grid(column=1, row=2, padx=10, pady=10)
                     
                    
 
