@@ -103,7 +103,12 @@ class CampusConnect:
         post_button = ttk.Button(tab, text="Post Topic", command=self.post_topic)
         post_button.grid(column=1, row=2, padx=10, pady=10)
 
-        
+
+    def post_topic(self):
+        user = self.forum_user_entry.get()
+        topic = self.forum_topic_entry.get()
+        self.forums.post_topic(user, topic)
+        messagebox.showinfo("Success", "Topic posted!")
 
                     
                    
