@@ -109,6 +109,28 @@ class CampusConnect:
         topic = self.forum_topic_entry.get()
         self.forums.post_topic(user, topic)
         messagebox.showinfo("Success", "Topic posted!")
+        
+    def create_appointments_tab(self, tab_control):
+        tab = ttk.Frame(tab_control)
+        tab_control.add(tab, text="Appointments")
+
+        student_label = ttk.Label(tab, text="Student:")
+        student_label.grid(column=0, row=0, padx=10, pady=10)
+        self.student_entry = ttk.Entry(tab)
+        self.student_entry.grid(column=1, row=0, padx=10, pady=10)
+
+        faculty_label = ttk.Label(tab, text="Faculty:")
+        faculty_label.grid(column=0, row=1, padx=10, pady=10)
+        self.faculty_entry = ttk.Entry(tab)
+        self.faculty_entry.grid(column=1, row=1, padx=10, pady=10)
+
+        datetime_label = ttk.Label(tab, text="DateTime:")
+        datetime_label.grid(column=0, row=2, padx=10, pady=10)
+        self.datetime_entry = ttk.Entry(tab)
+        self.datetime_entry.grid(column=1, row=2, padx=10, pady=10)
+
+        schedule_button = ttk.Button(tab, text="Schedule Appointment", command=self.schedule_appointment)
+        schedule_button.grid(column=1, row=3, padx=10, pady=10)
 
                     
                    
