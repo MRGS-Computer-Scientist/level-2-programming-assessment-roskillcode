@@ -55,15 +55,34 @@ class CampusConnect:
         send_button = ttk.Button(tab, text="Send Message", command=self.send_message)
         send_button.grid(column=1, row=3, padx=10, pady=10)
         
-        def send_message(self):
-            sender = self.sender_entry.get()
-            reciver = self.receiver_entry.get()
-            message = self.message_entry.get()
-            self.messaging.send_message(sender, reciver, message)
-            messagebox.showinfo("Success", "Message sent!")
+    def send_message(self):
+        sender = self.sender_entry.get()
+        reciver = self.receiver_entry.get()
+        message = self.message_entry.get()
+        self.messaging.send_message(sender, reciver, message)
+        messagebox.showinfo("Success", "Message sent!")
+
+
+    def create_announcements_tab(self, tab_control):
+        tab = ttk.Frame(tab_control)
+        tab_control.add(tab, text="Announcements")
+
+        sender_label = ttk.Label(tab, text="Sender:")
+        sender_label.grid(column=0, row=0, padx=10, pady=10)
+        self.announcement_sender_entry = ttk.Entry(tab)
+        self.announcement_sender_entry.grid(column=1, row=0, padx=10, pady=10)
+
+        announcement_label = ttk.Label(tab, text="Announcement:")
+        announcement_label.grid(column=0, row=1, padx=10, pady=10)
+        self.announcement_entry = ttk.Entry(tab)
+        self.announcement_entry.grid(column=1, row=1, padx=10, pady=10)
+
+        post_button = ttk.Button(tab, text="Post Announcement", command=self.post_announcement)
+        post_button.grid(column=1, row=2, padx=10, pady=10)
+
         
-        
-            
+
+                    
                    
 
 
