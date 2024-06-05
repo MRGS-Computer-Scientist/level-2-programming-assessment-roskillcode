@@ -85,6 +85,23 @@ class CampusConnect:
         announcement = self.announcement_entry.get()
         self.announcements.post_announcement(sender, announcement)
         messagebox.showinfo("Success", "Announcement posted!")
+        
+    def create_forums_tab(self, tab_control):
+        tab = ttk.Frame(tab_control)
+        tab_control.add(tab, text="Forums")
+
+        user_label = ttk.Label(tab, text="User:")
+        user_label.grid(column=0, row=0, padx=10, pady=10)
+        self.forum_user_entry = ttk.Entry(tab)
+        self.forum_user_entry.grid(column=1, row=0, padx=10, pady=10)
+
+        topic_label = ttk.Label(tab, text="Topic:")
+        topic_label.grid(column=0, row=1, padx=10, pady=10)
+        self.forum_topic_entry = ttk.Entry(tab)
+        self.forum_topic_entry.grid(column=1, row=1, padx=10, pady=10)
+
+        post_button = ttk.Button(tab, text="Post Topic", command=self.post_topic)
+        post_button.grid(column=1, row=2, padx=10, pady=10)
 
         
 
