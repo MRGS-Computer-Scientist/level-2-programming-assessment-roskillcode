@@ -11,6 +11,8 @@ class CampusConnectApp:
         self.root = root
         self.root.title("Campus Connect")
 
+        self.current_user = "hamish"  # Replace with actual logic to get current user
+
         self.messaging = Messaging()
         self.announcements = Announcements()
         self.forums = DiscussionForums()
@@ -22,6 +24,7 @@ class CampusConnectApp:
     def create_widgets(self):
         tab_control = ttk.Notebook(self.root)
 
+        self.create_start_page(tab_control)
         self.create_messaging_tab(tab_control)
         self.create_announcements_tab(tab_control)
         self.create_forums_tab(tab_control)
@@ -30,34 +33,64 @@ class CampusConnectApp:
 
         tab_control.pack(expand=1, fill='both')
 
+    def create_start_page(self, tab_control):
+        tab = ttk.Frame(tab_control)
+        tab_control.add(tab, text="Home")
+        welcome_label = ttk.Label(tab, text="Welcome to Campus Connect!", font=("Arial", 16))
+        welcome_label.pack(pady=20)
+
     def create_messaging_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Messaging")
 
+        self.chat_box = tk.Text(tab, state='disabled', width=50, height=15)
+        self.chat_box.grid(column=0, row=0, columnspan=2, padx=10, pady=10)
+
         sender_label = ttk.Label(tab, text="Sender:")
-        sender_label.grid(column=0, row=0, padx=10, pady=10)
+        sender_label.grid(column=0, row=1, padx=10, pady=10)
         self.sender_entry = ttk.Entry(tab)
-        self.sender_entry.grid(column=1, row=0, padx=10, pady=10)
+        self.sender_entry.grid(column=1, row=1, padx=10, pady=10)
 
         receiver_label = ttk.Label(tab, text="Receiver:")
-        receiver_label.grid(column=0, row=1, padx=10, pady=10)
+        receiver_label.grid(column=0, row=2, padx=10, pady=10)
         self.receiver_entry = ttk.Entry(tab)
-        self.receiver_entry.grid(column=1, row=1, padx=10, pady=10)
+        self.receiver_entry.grid(column=1, row=2, padx=10, pady=10)
 
         message_label = ttk.Label(tab, text="Message:")
-        message_label.grid(column=0, row=2, padx=10, pady=10)
+        message_label.grid(column=0, row=3, padx=10, pady=10)
         self.message_entry = ttk.Entry(tab)
-        self.message_entry.grid(column=1, row=2, padx=10, pady=10)
+        self.message_entry.grid(column=1, row=3, padx=10, pady=10)
 
         send_button = ttk.Button(tab, text="Send Message", command=self.send_message)
-        send_button.grid(column=1, row=3, padx=10, pady=10)
+        send_button.grid(column=1, row=4, padx=10, pady=10)
+
+        self.load_chat_history()
 
     def send_message(self):
         sender = self.sender_entry.get()
         receiver = self.receiver_entry.get()
         message = self.message_entry.get()
-        self.messaging.send_message(sender, receiver, message)
-        messagebox.showinfo("Success", "Message sent!")
+
+        if sender and receiver and message:
+            new_message = self.messaging.send_message(sender, receiver, message)
+            if new_message:  # Check if new_message is not None
+                self.append_message_to_chat(new_message)
+                messagebox.showinfo("Success", "Message sent!")
+            else:
+                messagebox.showerror("Error", "Failed to send message. Please try again.")
+        else:
+            messagebox.showwarning("Warning", "All fields are required!")
+
+    def append_message_to_chat(self, message):
+        self.chat_box.configure(state='normal')
+        self.chat_box.insert('end', f"{message['sender']} to {message['receiver']}: {message['message']}\n")
+        self.chat_box.configure(state='disabled')
+        self.chat_box.yview('end')
+
+    def load_chat_history(self):
+        messages = self.messaging.get_messages(self.current_user)
+        for message in messages:
+            self.append_message_to_chat(message)
 
     def create_announcements_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
@@ -79,8 +112,11 @@ class CampusConnectApp:
     def post_announcement(self):
         sender = self.announcement_sender_entry.get()
         announcement = self.announcement_entry.get()
-        self.announcements.post_announcement(sender, announcement)
-        messagebox.showinfo("Success", "Announcement posted!")
+        if sender and announcement:
+            self.announcements.post_announcement(sender, announcement)
+            messagebox.showinfo("Success", "Announcement posted!")
+        else:
+            messagebox.showwarning("Warning", "All fields are required!")
 
     def create_forums_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
@@ -102,8 +138,11 @@ class CampusConnectApp:
     def post_topic(self):
         user = self.forum_user_entry.get()
         topic = self.forum_topic_entry.get()
-        self.forums.post_topic(user, topic)
-        messagebox.showinfo("Success", "Topic posted!")
+        if user and topic:
+            self.forums.post_topic(user, topic)
+            messagebox.showinfo("Success", "Topic posted!")
+        else:
+            messagebox.showwarning("Warning", "All fields are required!")
 
     def create_appointments_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
@@ -131,8 +170,11 @@ class CampusConnectApp:
         student = self.student_entry.get()
         faculty = self.faculty_entry.get()
         datetime = self.datetime_entry.get()
-        self.appointments.schedule_appointment(student, faculty, datetime)
-        messagebox.showinfo("Success", "Appointment scheduled!")
+        if student and faculty and datetime:
+            self.appointments.schedule_appointment(student, faculty, datetime)
+            messagebox.showinfo("Success", "Appointment scheduled!")
+        else:
+            messagebox.showwarning("Warning", "All fields are required!")
 
     def create_notifications_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
@@ -154,8 +196,11 @@ class CampusConnectApp:
     def send_notification(self):
         user = self.notification_user_entry.get()
         notification = self.notification_entry.get()
-        self.notifications.send_notification(user, notification)
-        messagebox.showinfo("Success", "Notification sent!")
+        if user and notification:
+            self.notifications.send_notification(user, notification)
+            messagebox.showinfo("Success", "Notification sent!")
+        else:
+            messagebox.showwarning("Warning", "All fields are required!")
 
 if __name__ == "__main__":
     root = tk.Tk()
