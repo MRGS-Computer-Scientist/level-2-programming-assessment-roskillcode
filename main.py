@@ -1,7 +1,8 @@
 import tkinter as tk
+from tkinter import ttk, messagebox
 import json
 import os
-from tkinter import ttk, messagebox
+
 from messaging import Messaging
 from announcements import Announcements
 from forums import DiscussionForums
@@ -9,41 +10,13 @@ from appointments import AppointmentScheduling
 from notifications import PushNotifications
 from user_management import UserManagement
 
-
-class UserManagement:
-    def __init__(self):
-        self.file_path = 'users.json'
-        if not os.path.exists(self.file_path):
-            with open(self.file_path, 'w') as f:
-                json.dump({}, f)
-
-    def save_user(self, username, password):
-        with open(self.file_path, 'r') as f:
-            users = json.load(f)
-        if username in users:
-            return False
-        users[username] = password
-        with open(self.file_path, 'w') as f:
-            json.dump(users, f)
-        return True
-
-    def verify_user(self, username, password):
-        with open(self.file_path, 'r') as f:
-            users = json.load(f)
-        if username in users and users[username] == password:
-            return True
-        return False
-
-
-    
-    
-    
 class CampusConnectApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Campus Connect")
 
-        self.current_user = "hamish"  # Replace with actual logic to get current user
+        self.current_user = None
+        self.user_management = UserManagement()
 
         self.messaging = Messaging()
         self.announcements = Announcements()
@@ -51,11 +24,80 @@ class CampusConnectApp:
         self.appointments = AppointmentScheduling()
         self.notifications = PushNotifications()
 
-        self.create_widgets()
+        self.create_login_widgets()
+
+    def create_login_widgets(self):
+        self.clear_frame()
+
+        self.login_frame = ttk.Frame(self.root)
+        self.login_frame.pack(padx=10, pady=10)
+
+        username_label = ttk.Label(self.login_frame, text="Username:")
+        username_label.grid(column=0, row=0, padx=10, pady=10)
+        self.username_entry = ttk.Entry(self.login_frame)
+        self.username_entry.grid(column=1, row=0, padx=10, pady=10)
+
+        password_label = ttk.Label(self.login_frame, text="Password:")
+        password_label.grid(column=0, row=1, padx=10, pady=10)
+        self.password_entry = ttk.Entry(self.login_frame, show="*")
+        self.password_entry.grid(column=1, row=1, padx=10, pady=10)
+
+        login_button = ttk.Button(self.login_frame, text="Login", command=self.login)
+        login_button.grid(column=1, row=2, padx=10, pady=10, sticky="e")
+
+        signup_button = ttk.Button(self.login_frame, text="Sign Up", command=self.create_signup_widgets)
+        signup_button.grid(column=0, row=2, padx=10, pady=10, sticky="w")
+
+    def create_signup_widgets(self):
+        self.clear_frame()
+
+        self.signup_frame = ttk.Frame(self.root)
+        self.signup_frame.pack(padx=10, pady=10)
+
+        username_label = ttk.Label(self.signup_frame, text="Username:")
+        username_label.grid(column=0, row=0, padx=10, pady=10)
+        self.signup_username_entry = ttk.Entry(self.signup_frame)
+        self.signup_username_entry.grid(column=1, row=0, padx=10, pady=10)
+
+        password_label = ttk.Label(self.signup_frame, text="Password:")
+        password_label.grid(column=0, row=1, padx=10, pady=10)
+        self.signup_password_entry = ttk.Entry(self.signup_frame, show="*")
+        self.signup_password_entry.grid(column=1, row=1, padx=10, pady=10)
+
+        signup_button = ttk.Button(self.signup_frame, text="Sign Up", command=self.signup)
+        signup_button.grid(column=1, row=2, padx=10, pady=10, sticky="e")
+
+        back_button = ttk.Button(self.signup_frame, text="Back", command=self.create_login_widgets)
+        back_button.grid(column=0, row=2, padx=10, pady=10, sticky="w")
+
+    def clear_frame(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+    def login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        if self.user_management.login(username, password):
+            self.current_user = username
+            self.create_widgets()
+        else:
+            messagebox.showerror("Login Failed", "Invalid username or password.")
+
+    def signup(self):
+        username = self.signup_username_entry.get()
+        password = self.signup_password_entry.get()
+
+        if self.user_management.signup(username, password):
+            messagebox.showinfo("Success", "Account created successfully!")
+            self.create_login_widgets()
+        else:
+            messagebox.showerror("Signup Failed", "Username already exists or invalid details.")
 
     def create_widgets(self):
+        self.clear_frame()
+        
         tab_control = ttk.Notebook(self.root)
-
         self.create_start_page(tab_control)
         self.create_messaging_tab(tab_control)
         self.create_announcements_tab(tab_control)
@@ -128,35 +170,21 @@ class CampusConnectApp:
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Announcements")
 
-        # Announcement posting section
-        post_frame = ttk.LabelFrame(tab, text="Post New Announcement")
-        post_frame.grid(column=0, row=0, padx=10, pady=10, sticky="ew")
+        sender_label = ttk.Label(tab, text="Sender:")
+        sender_label.grid(column=0, row=0, padx=10, pady=10)
+        self.announcement_sender_entry = ttk.Entry(tab)
+        self.announcement_sender_entry.grid(column=1, row=0, padx=10, pady=10)
 
-        sender_label = ttk.Label(post_frame, text="Sender:")
-        sender_label.grid(column=0, row=0, padx=10, pady=5)
-        self.announcement_sender_entry = ttk.Entry(post_frame)
-        self.announcement_sender_entry.grid(column=1, row=0, padx=10, pady=5)
+        announcement_label = ttk.Label(tab, text="Announcement:")
+        announcement_label.grid(column=0, row=1, padx=10, pady=10)
+        self.announcement_entry = ttk.Entry(tab)
+        self.announcement_entry.grid(column=1, row=1, padx=10, pady=10)
 
-        announcement_label = ttk.Label(post_frame, text="Announcement:")
-        announcement_label.grid(column=0, row=1, padx=10, pady=5)
-        self.announcement_entry = ttk.Entry(post_frame)
-        self.announcement_entry.grid(column=1, row=1, padx=10, pady=5)
+        post_button = ttk.Button(tab, text="Post Announcement", command=self.post_announcement)
+        post_button.grid(column=1, row=2, padx=10, pady=10)
 
-        post_button = ttk.Button(post_frame, text="Post Announcement", command=self.post_announcement)
-        post_button.grid(column=1, row=2, padx=10, pady=5, sticky="e")
-
-        # Announcements display section
-        display_frame = ttk.LabelFrame(tab, text="Announcements")
-        display_frame.grid(column=0, row=1, padx=10, pady=10, sticky="nsew")
-
-        self.announcement_listbox = tk.Listbox(display_frame, height=10, width=50)
-        self.announcement_listbox.pack(side="left", fill="both", expand=True, padx=5, pady=5)
-
-        scrollbar = ttk.Scrollbar(display_frame, orient="vertical")
-        scrollbar.pack(side="right", fill="y")
-
-        self.announcement_listbox.config(yscrollcommand=scrollbar.set)
-        scrollbar.config(command=self.announcement_listbox.yview)
+        self.announcements_listbox = tk.Listbox(tab, width=50, height=10)
+        self.announcements_listbox.grid(column=0, row=3, columnspan=2, padx=10, pady=10)
 
         self.load_announcements()
 
@@ -171,10 +199,10 @@ class CampusConnectApp:
             messagebox.showwarning("Warning", "All fields are required!")
 
     def load_announcements(self):
-        self.announcement_listbox.delete(0, tk.END)
+        self.announcements_listbox.delete(0, tk.END)
         announcements = self.announcements.get_announcements()
         for announcement in announcements:
-            self.announcement_listbox.insert(tk.END, f"{announcement['sender']}: {announcement['announcement']}")
+            self.announcements_listbox.insert(tk.END, f"{announcement['sender']}: {announcement['announcement']}")
 
     def create_forums_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
