@@ -96,27 +96,53 @@ class CampusConnectApp:
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Announcements")
 
-        sender_label = ttk.Label(tab, text="Sender:")
-        sender_label.grid(column=0, row=0, padx=10, pady=10)
-        self.announcement_sender_entry = ttk.Entry(tab)
-        self.announcement_sender_entry.grid(column=1, row=0, padx=10, pady=10)
+        # Announcement posting section
+        post_frame = ttk.LabelFrame(tab, text="Post New Announcement")
+        post_frame.grid(column=0, row=0, padx=10, pady=10, sticky="ew")
 
-        announcement_label = ttk.Label(tab, text="Announcement:")
-        announcement_label.grid(column=0, row=1, padx=10, pady=10)
-        self.announcement_entry = ttk.Entry(tab)
-        self.announcement_entry.grid(column=1, row=1, padx=10, pady=10)
+        sender_label = ttk.Label(post_frame, text="Sender:")
+        sender_label.grid(column=0, row=0, padx=10, pady=5)
+        self.announcement_sender_entry = ttk.Entry(post_frame)
+        self.announcement_sender_entry.grid(column=1, row=0, padx=10, pady=5)
 
-        post_button = ttk.Button(tab, text="Post Announcement", command=self.post_announcement)
-        post_button.grid(column=1, row=2, padx=10, pady=10)
+        announcement_label = ttk.Label(post_frame, text="Announcement:")
+        announcement_label.grid(column=0, row=1, padx=10, pady=5)
+        self.announcement_entry = ttk.Entry(post_frame)
+        self.announcement_entry.grid(column=1, row=1, padx=10, pady=5)
+
+        post_button = ttk.Button(post_frame, text="Post Announcement", command=self.post_announcement)
+        post_button.grid(column=1, row=2, padx=10, pady=5, sticky="e")
+
+        # Announcements display section
+        display_frame = ttk.LabelFrame(tab, text="Announcements")
+        display_frame.grid(column=0, row=1, padx=10, pady=10, sticky="nsew")
+
+        self.announcement_listbox = tk.Listbox(display_frame, height=10, width=50)
+        self.announcement_listbox.pack(side="left", fill="both", expand=True, padx=5, pady=5)
+
+        scrollbar = ttk.Scrollbar(display_frame, orient="vertical")
+        scrollbar.pack(side="right", fill="y")
+
+        self.announcement_listbox.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.announcement_listbox.yview)
+
+        self.load_announcements()
 
     def post_announcement(self):
         sender = self.announcement_sender_entry.get()
         announcement = self.announcement_entry.get()
         if sender and announcement:
             self.announcements.post_announcement(sender, announcement)
+            self.load_announcements()
             messagebox.showinfo("Success", "Announcement posted!")
         else:
             messagebox.showwarning("Warning", "All fields are required!")
+
+    def load_announcements(self):
+        self.announcement_listbox.delete(0, tk.END)
+        announcements = self.announcements.get_announcements()
+        for announcement in announcements:
+            self.announcement_listbox.insert(tk.END, f"{announcement['sender']}: {announcement['announcement']}")
 
     def create_forums_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
