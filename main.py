@@ -176,6 +176,7 @@ class CampusConnectApp:
         announcement = self.announcement_entry.get()
         if sender and announcement:
             self.announcements.post_announcement(sender, announcement)
+            self.announcements.save_announcements()  # Save announcements to file
             messagebox.showinfo("Success", "Announcement posted!")
             self.load_announcements()  # Reload announcements on the home page
         else:
