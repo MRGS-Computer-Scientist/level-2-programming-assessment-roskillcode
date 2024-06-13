@@ -2,30 +2,28 @@ import json
 import os
 
 class UserManagement:
-    def __init__(self):
-        self.file_path = 'users.json'
-        if not os.path.exists(self.file_path):
-            with open(self.file_path, 'w') as f:
-                json.dump({}, f)
+    def __init__(self, user_data_file="users.json"):
+        self.user_data_file = user_data_file
+        self.users = self.load_users()
 
-    def signup(self, username, password):
-        with open(self.file_path, 'r') as f:
-            users = json.load(f)
+    def load_users(self):
+        if os.path.exists(self.user_data_file):
+            with open(self.user_data_file, "r") as file:
+                return json.load(file)
+        return {}
 
-        if username in users:
-            return False
+    def save_users(self):
+        with open(self.user_data_file, "w") as file:
+            json.dump(self.users, file)
 
-        users[username] = password
-        with open(self.file_path, 'w') as f:
-            json.dump(users, f)
-
-        return True
-
-    def login(self, username, password):
-        with open(self.file_path, 'r') as f:
-            users = json.load(f)
-
-        if username in users and users[username] == password:
+    def authenticate_user(self, username, password):
+        if username in self.users and self.users[username] == password:
             return True
+        return False
 
+    def create_user(self, username, password):
+        if username not in self.users:
+            self.users[username] = password
+            self.save_users()
+            return True
         return False

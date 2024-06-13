@@ -1,8 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import json
-import os
-
 from messaging import Messaging
 from announcements import Announcements
 from forums import DiscussionForums
@@ -14,6 +11,7 @@ class CampusConnectApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Campus Connect")
+        self.root.geometry("800x600")
 
         self.current_user = None
         self.user_management = UserManagement()
@@ -30,74 +28,50 @@ class CampusConnectApp:
         self.clear_frame()
 
         self.login_frame = ttk.Frame(self.root)
-        self.login_frame.pack(padx=10, pady=10)
+        self.login_frame.pack(padx=10, pady=10, expand=True)
+
+        title_label = ttk.Label(self.login_frame, text="Campus Connect", font=("Arial", 24))
+        title_label.grid(column=0, row=0, columnspan=2, pady=20)
 
         username_label = ttk.Label(self.login_frame, text="Username:")
-        username_label.grid(column=0, row=0, padx=10, pady=10)
+        username_label.grid(column=0, row=1, padx=10, pady=10)
         self.username_entry = ttk.Entry(self.login_frame)
-        self.username_entry.grid(column=1, row=0, padx=10, pady=10)
+        self.username_entry.grid(column=1, row=1, padx=10, pady=10)
 
         password_label = ttk.Label(self.login_frame, text="Password:")
-        password_label.grid(column=0, row=1, padx=10, pady=10)
+        password_label.grid(column=0, row=2, padx=10, pady=10)
         self.password_entry = ttk.Entry(self.login_frame, show="*")
-        self.password_entry.grid(column=1, row=1, padx=10, pady=10)
+        self.password_entry.grid(column=1, row=2, padx=10, pady=10)
 
         login_button = ttk.Button(self.login_frame, text="Login", command=self.login)
-        login_button.grid(column=1, row=2, padx=10, pady=10, sticky="e")
+        login_button.grid(column=0, row=3, padx=10, pady=10)
 
-        signup_button = ttk.Button(self.login_frame, text="Sign Up", command=self.create_signup_widgets)
-        signup_button.grid(column=0, row=2, padx=10, pady=10, sticky="w")
-
-    def create_signup_widgets(self):
-        self.clear_frame()
-
-        self.signup_frame = ttk.Frame(self.root)
-        self.signup_frame.pack(padx=10, pady=10)
-
-        username_label = ttk.Label(self.signup_frame, text="Username:")
-        username_label.grid(column=0, row=0, padx=10, pady=10)
-        self.signup_username_entry = ttk.Entry(self.signup_frame)
-        self.signup_username_entry.grid(column=1, row=0, padx=10, pady=10)
-
-        password_label = ttk.Label(self.signup_frame, text="Password:")
-        password_label.grid(column=0, row=1, padx=10, pady=10)
-        self.signup_password_entry = ttk.Entry(self.signup_frame, show="*")
-        self.signup_password_entry.grid(column=1, row=1, padx=10, pady=10)
-
-        signup_button = ttk.Button(self.signup_frame, text="Sign Up", command=self.signup)
-        signup_button.grid(column=1, row=2, padx=10, pady=10, sticky="e")
-
-        back_button = ttk.Button(self.signup_frame, text="Back", command=self.create_login_widgets)
-        back_button.grid(column=0, row=2, padx=10, pady=10, sticky="w")
-
-    def clear_frame(self):
-        for widget in self.root.winfo_children():
-            widget.destroy()
+        signup_button = ttk.Button(self.login_frame, text="Signup", command=self.signup)
+        signup_button.grid(column=1, row=3, padx=10, pady=10)
 
     def login(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
-
-        if self.user_management.login(username, password):
+        if self.user_management.authenticate_user(username, password):
             self.current_user = username
-            self.create_widgets()
+            self.create_main_widgets()
         else:
-            messagebox.showerror("Login Failed", "Invalid username or password.")
+            messagebox.showerror("Error", "Invalid credentials. Please try again.")
 
     def signup(self):
-        username = self.signup_username_entry.get()
-        password = self.signup_password_entry.get()
-
-        if self.user_management.signup(username, password):
-            messagebox.showinfo("Success", "Account created successfully!")
-            self.create_login_widgets()
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        if self.user_management.create_user(username, password):
+            self.current_user = username
+            self.create_main_widgets()
         else:
-            messagebox.showerror("Signup Failed", "Username already exists or invalid details.")
+            messagebox.showerror("Error", "Username already exists. Please try another username.")
 
-    def create_widgets(self):
+    def create_main_widgets(self):
         self.clear_frame()
-        
+
         tab_control = ttk.Notebook(self.root)
+
         self.create_start_page(tab_control)
         self.create_messaging_tab(tab_control)
         self.create_announcements_tab(tab_control)
@@ -110,14 +84,28 @@ class CampusConnectApp:
     def create_start_page(self, tab_control):
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Home")
-        welcome_label = ttk.Label(tab, text="Welcome to Campus Connect!", font=("Arial", 16))
+        
+        welcome_label = ttk.Label(tab, text=f"Welcome to Campus Connect, {self.current_user}!", font=("Arial", 16))
         welcome_label.pack(pady=20)
+        
+        self.announcements_box = tk.Text(tab, state='disabled', width=80, height=15, bg="#f0f0f0", font=("Arial", 12))
+        self.announcements_box.pack(pady=10, padx=10)
+
+        self.load_announcements()
+
+    def load_announcements(self):
+        announcements = self.announcements.get_announcements()
+        self.announcements_box.configure(state='normal')
+        self.announcements_box.delete(1.0, 'end')
+        for announcement in announcements:
+            self.announcements_box.insert('end', f"{announcement['sender']}: {announcement['announcement']}\n\n")
+        self.announcements_box.configure(state='disabled')
 
     def create_messaging_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Messaging")
 
-        self.chat_box = tk.Text(tab, state='disabled', width=50, height=15)
+        self.chat_box = tk.Text(tab, state='disabled', width=80, height=15, bg="#f0f0f0", font=("Arial", 12))
         self.chat_box.grid(column=0, row=0, columnspan=2, padx=10, pady=10)
 
         sender_label = ttk.Label(tab, text="Sender:")
@@ -183,26 +171,15 @@ class CampusConnectApp:
         post_button = ttk.Button(tab, text="Post Announcement", command=self.post_announcement)
         post_button.grid(column=1, row=2, padx=10, pady=10)
 
-        self.announcements_listbox = tk.Listbox(tab, width=50, height=10)
-        self.announcements_listbox.grid(column=0, row=3, columnspan=2, padx=10, pady=10)
-
-        self.load_announcements()
-
     def post_announcement(self):
         sender = self.announcement_sender_entry.get()
         announcement = self.announcement_entry.get()
         if sender and announcement:
             self.announcements.post_announcement(sender, announcement)
-            self.load_announcements()
             messagebox.showinfo("Success", "Announcement posted!")
+            self.load_announcements()  # Reload announcements on the home page
         else:
             messagebox.showwarning("Warning", "All fields are required!")
-
-    def load_announcements(self):
-        self.announcements_listbox.delete(0, tk.END)
-        announcements = self.announcements.get_announcements()
-        for announcement in announcements:
-            self.announcements_listbox.insert(tk.END, f"{announcement['sender']}: {announcement['announcement']}")
 
     def create_forums_tab(self, tab_control):
         tab = ttk.Frame(tab_control)
@@ -287,6 +264,10 @@ class CampusConnectApp:
             messagebox.showinfo("Success", "Notification sent!")
         else:
             messagebox.showwarning("Warning", "All fields are required!")
+
+    def clear_frame(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
