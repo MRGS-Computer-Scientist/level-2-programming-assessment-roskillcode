@@ -9,6 +9,7 @@ from user_management import UserManagement
 
 class CampusConnectApp:
     def __init__(self, root):
+        """Initialize the application with root window, title, size, and initializations."""
         self.root = root
         self.root.title("Campus Connect")
         self.root.geometry("800x600")
@@ -16,20 +17,24 @@ class CampusConnectApp:
         self.current_user = None
         self.user_management = UserManagement()
 
+        # Initialize various components of the application
         self.messaging = Messaging()
         self.announcements = Announcements()
         self.forums = DiscussionForums()
         self.appointments = AppointmentScheduling()
         self.notifications = PushNotifications()
 
+        # Create login widgets on initialization
         self.create_login_widgets()
 
     def create_login_widgets(self):
+        """Create login interface with username, password fields and buttons."""
         self.clear_frame()
 
         self.login_frame = ttk.Frame(self.root)
         self.login_frame.pack(padx=10, pady=10, expand=True)
 
+        # Widgets for username and password entry
         title_label = ttk.Label(self.login_frame, text="Campus Connect", font=("Arial", 24))
         title_label.grid(column=0, row=0, columnspan=2, pady=20)
 
@@ -50,6 +55,7 @@ class CampusConnectApp:
         signup_button.grid(column=1, row=3, padx=10, pady=10)
 
     def login(self):
+        """Validate user credentials and log in."""
         username = self.username_entry.get()
         password = self.password_entry.get()
         if not username or not password:
@@ -62,6 +68,7 @@ class CampusConnectApp:
             messagebox.showerror("Error", "Invalid credentials. Please try again.")
 
     def signup(self):
+        """Create a new user account."""
         username = self.username_entry.get()
         password = self.password_entry.get()
         if not username or not password:
@@ -74,10 +81,12 @@ class CampusConnectApp:
             messagebox.showerror("Error", "Username already exists. Please try another username.")
 
     def create_main_widgets(self):
+        """Create main application interface with tabs for different functionalities."""
         self.clear_frame()
 
         tab_control = ttk.Notebook(self.root)
 
+        # Create tabs for different functionalities
         self.create_start_page(tab_control)
         self.create_messaging_tab(tab_control)
         self.create_announcements_tab(tab_control)
@@ -88,18 +97,21 @@ class CampusConnectApp:
         tab_control.pack(expand=1, fill='both')
 
     def create_start_page(self, tab_control):
+        """Create 'Home' tab with welcome message and announcements."""
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Home")
         
         welcome_label = ttk.Label(tab, text=f"Welcome to Campus Connect, {self.current_user}!", font=("Arial", 16))
         welcome_label.pack(pady=20)
         
+        # Display area for announcements
         self.announcements_box = tk.Text(tab, state='disabled', width=80, height=15, bg="#f0f0f0", font=("Arial", 12))
         self.announcements_box.pack(pady=10, padx=10)
 
         self.load_announcements()
 
     def load_announcements(self):
+        """Load announcements into the 'Home' tab."""
         announcements = self.announcements.get_announcements()
         self.announcements_box.configure(state='normal')
         self.announcements_box.delete(1.0, 'end')
@@ -108,9 +120,11 @@ class CampusConnectApp:
         self.announcements_box.configure(state='disabled')
 
     def create_messaging_tab(self, tab_control):
+        """Create 'Messaging' tab with chat functionality."""
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Messaging")
 
+        # Widgets for sending and receiving messages
         self.chat_box = tk.Text(tab, state='disabled', width=80, height=15, bg="#f0f0f0", font=("Arial", 12))
         self.chat_box.grid(column=0, row=0, columnspan=2, padx=10, pady=10)
 
@@ -135,13 +149,14 @@ class CampusConnectApp:
         self.load_chat_history()
 
     def send_message(self):
+        """Send a message from one user to another."""
         sender = self.sender_entry.get()
         receiver = self.receiver_entry.get()
         message = self.message_entry.get()
 
         if sender and receiver and message:
             new_message = self.messaging.send_message(sender, receiver, message)
-            if new_message:  # Check if new_message is not None
+            if new_message:
                 self.append_message_to_chat(new_message)
                 messagebox.showinfo("Success", "Message sent!")
             else:
@@ -150,17 +165,20 @@ class CampusConnectApp:
             messagebox.showwarning("Warning", "All fields are required!")
 
     def append_message_to_chat(self, message):
+        """Append a message to the chat box."""
         self.chat_box.configure(state='normal')
         self.chat_box.insert('end', f"{message['sender']} to {message['receiver']}: {message['message']}\n")
         self.chat_box.configure(state='disabled')
         self.chat_box.yview('end')
 
     def load_chat_history(self):
+        """Load chat history for the current user."""
         messages = self.messaging.get_messages(self.current_user)
         for message in messages:
             self.append_message_to_chat(message)
 
     def create_announcements_tab(self, tab_control):
+        """Create 'Announcements' tab with functionality to post announcements."""
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Announcements")
 
@@ -178,6 +196,7 @@ class CampusConnectApp:
         post_button.grid(column=1, row=2, padx=10, pady=10)
 
     def post_announcement(self):
+        """Post an announcement."""
         sender = self.announcement_sender_entry.get()
         announcement = self.announcement_entry.get()
         if sender and announcement:
@@ -189,6 +208,7 @@ class CampusConnectApp:
             messagebox.showwarning("Warning", "All fields are required!")
 
     def create_forums_tab(self, tab_control):
+        """Create 'Forums' tab with functionality to post topics."""
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Forums")
 
@@ -206,6 +226,7 @@ class CampusConnectApp:
         post_button.grid(column=1, row=2, padx=10, pady=10)
 
     def post_topic(self):
+        """Post a topic to the forums."""
         user = self.forum_user_entry.get()
         topic = self.forum_topic_entry.get()
         if user and topic:
@@ -215,6 +236,7 @@ class CampusConnectApp:
             messagebox.showwarning("Warning", "All fields are required!")
 
     def create_appointments_tab(self, tab_control):
+        """Create 'Appointments' tab with functionality to schedule appointments."""
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Appointments")
 
@@ -237,6 +259,7 @@ class CampusConnectApp:
         schedule_button.grid(column=1, row=3, padx=10, pady=10)
 
     def schedule_appointment(self):
+        """Schedule an appointment between a student and faculty."""
         student = self.student_entry.get()
         faculty = self.faculty_entry.get()
         datetime = self.datetime_entry.get()
@@ -247,6 +270,7 @@ class CampusConnectApp:
             messagebox.showwarning("Warning", "All fields are required!")
 
     def create_notifications_tab(self, tab_control):
+        """Create 'Notifications' tab with functionality to send notifications."""
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Notifications")
 
@@ -264,6 +288,7 @@ class CampusConnectApp:
         send_button.grid(column=1, row=2, padx=10, pady=10)
 
     def send_notification(self):
+        """Send a notification to a user."""
         user = self.notification_user_entry.get()
         notification = self.notification_entry.get()
         if user and notification:
@@ -273,6 +298,7 @@ class CampusConnectApp:
             messagebox.showwarning("Warning", "All fields are required!")
 
     def clear_frame(self):
+        """Clear all widgets from the root frame."""
         for widget in self.root.winfo_children():
             widget.destroy()
 
