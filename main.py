@@ -52,6 +52,9 @@ class CampusConnectApp:
     def login(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
+        if not username or not password:
+            messagebox.showwarning("Warning", "Both username and password are required.")
+            return
         if self.user_management.authenticate_user(username, password):
             self.current_user = username
             self.create_main_widgets()
@@ -61,6 +64,9 @@ class CampusConnectApp:
     def signup(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
+        if not username or not password:
+            messagebox.showwarning("Warning", "Both username and password are required.")
+            return
         if self.user_management.create_user(username, password):
             self.current_user = username
             self.create_main_widgets()
