@@ -3,12 +3,14 @@ import os
 
 class Messaging:
     def __init__(self):
+        # Initialize the Messaging class by creating an empty messages file if it doesn't exist.
         self.file_path = 'messages.json'
         if not os.path.exists(self.file_path):
             with open(self.file_path, 'w') as f:
                 json.dump([], f)
 
     def send_message(self, sender, receiver, message):
+        # Send a message from sender to receiver and save it to the messages file.
         new_message = {'sender': sender, 'receiver': receiver, 'message': message}
         try:
             with open(self.file_path, 'r') as f:
@@ -22,6 +24,7 @@ class Messaging:
             return None  # Return None in case of an error
 
     def get_messages(self, user):
+        # Retrieve all messages sent or received by the specified user.
         try:
             with open(self.file_path, 'r') as f:
                 messages = json.load(f)
