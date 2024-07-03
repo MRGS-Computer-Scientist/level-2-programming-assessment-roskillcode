@@ -140,7 +140,7 @@ class CampusConnectApp:
 
         message_label = ttk.Label(tab, text="Message:")
         message_label.grid(column=0, row=3, padx=10, pady=10)
-        self.message_entry = ttk.Entry(tab)
+        self.message_entry = ttk.Entry(tab, width=80)
         self.message_entry.grid(column=1, row=3, padx=10, pady=10)
 
         send_button = ttk.Button(tab, text="Send Message", command=self.send_message)
