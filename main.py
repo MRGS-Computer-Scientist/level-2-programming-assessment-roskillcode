@@ -27,6 +27,11 @@ class CampusConnectApp:
         # Create login widgets on initialization
         self.create_login_widgets()
 
+    def clear_frame(self):
+        # Clear all widgets from the root frame.
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
     def create_login_widgets(self):
         # Create login interface with username, password fields and buttons.
         self.clear_frame()
@@ -140,7 +145,7 @@ class CampusConnectApp:
 
         message_label = ttk.Label(tab, text="Message:")
         message_label.grid(column=0, row=3, padx=10, pady=10)
-        self.message_entry = ttk.Entry(tab, width=80)
+        self.message_entry = tk.Text(tab, height=4, width=40)
         self.message_entry.grid(column=1, row=3, padx=10, pady=10)
 
         send_button = ttk.Button(tab, text="Send Message", command=self.send_message)
@@ -149,36 +154,36 @@ class CampusConnectApp:
         self.load_chat_history()
 
     def send_message(self):
-        #Send a message from one user to another.
+        # Send a message from one user to another.
         sender = self.sender_entry.get()
         receiver = self.receiver_entry.get()
-        message = self.message_entry.get()
+        message = self.message_entry.get("1.0", tk.END).strip()  # Get message from Text widget and strip any extra whitespace
 
         if sender and receiver and message:
-            new_message = self.messaging.send_message(sender, receiver, message)
+            new_message, error_message = self.messaging.send_message(sender, receiver, message)
             if new_message:
                 self.append_message_to_chat(new_message)
                 messagebox.showinfo("Success", "Message sent!")
             else:
-                messagebox.showerror("Error", "Failed to send message. Please try again.")
+                messagebox.showerror("Error", error_message)
         else:
             messagebox.showwarning("Warning", "All fields are required!")
 
     def append_message_to_chat(self, message):
-        #Append a message to the chat box.
+        # Append a message to the chat box.
         self.chat_box.configure(state='normal')
         self.chat_box.insert('end', f"{message['sender']} to {message['receiver']}: {message['message']}\n")
         self.chat_box.configure(state='disabled')
         self.chat_box.yview('end')
 
     def load_chat_history(self):
-        #Load chat history for the current user.
+        # Load chat history for the current user.
         messages = self.messaging.get_messages(self.current_user)
         for message in messages:
             self.append_message_to_chat(message)
 
     def create_announcements_tab(self, tab_control):
-        #Create 'Announcements' tab with functionality to post announcements.
+        # Create 'Announcements' tab with functionality to post announcements.
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Announcements")
 
@@ -196,7 +201,7 @@ class CampusConnectApp:
         post_button.grid(column=1, row=2, padx=10, pady=10)
 
     def post_announcement(self):
-        #Post an announcement.
+        # Post an announcement.
         sender = self.announcement_sender_entry.get()
         announcement = self.announcement_entry.get()
         if sender and announcement:
@@ -208,99 +213,23 @@ class CampusConnectApp:
             messagebox.showwarning("Warning", "All fields are required!")
 
     def create_forums_tab(self, tab_control):
-        #Create 'Forums' tab with functionality to post topics.
+        # Create 'Forums' tab for discussion forums.
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Forums")
-
-        user_label = ttk.Label(tab, text="User:")
-        user_label.grid(column=0, row=0, padx=10, pady=10)
-        self.forum_user_entry = ttk.Entry(tab)
-        self.forum_user_entry.grid(column=1, row=0, padx=10, pady=10)
-
-        topic_label = ttk.Label(tab, text="Topic:")
-        topic_label.grid(column=0, row=1, padx=10, pady=10)
-        self.forum_topic_entry = ttk.Entry(tab)
-        self.forum_topic_entry.grid(column=1, row=1, padx=10, pady=10)
-
-        post_button = ttk.Button(tab, text="Post Topic", command=self.post_topic)
-        post_button.grid(column=1, row=2, padx=10, pady=10)
-
-    def post_topic(self):
-        #Post a topic to the forums.
-        user = self.forum_user_entry.get()
-        topic = self.forum_topic_entry.get()
-        if user and topic:
-            self.forums.post_topic(user, topic)
-            messagebox.showinfo("Success", "Topic posted!")
-        else:
-            messagebox.showwarning("Warning", "All fields are required!")
+        # Add your forum functionality here
 
     def create_appointments_tab(self, tab_control):
-        #Create 'Appointments' tab with functionality to schedule appointments.
+        # Create 'Appointments' tab for scheduling appointments.
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Appointments")
-
-        student_label = ttk.Label(tab, text="Student:")
-        student_label.grid(column=0, row=0, padx=10, pady=10)
-        self.student_entry = ttk.Entry(tab)
-        self.student_entry.grid(column=1, row=0, padx=10, pady=10)
-
-        faculty_label = ttk.Label(tab, text="Faculty:")
-        faculty_label.grid(column=0, row=1, padx=10, pady=10)
-        self.faculty_entry = ttk.Entry(tab)
-        self.faculty_entry.grid(column=1, row=1, padx=10, pady=10)
-
-        datetime_label = ttk.Label(tab, text="DateTime:")
-        datetime_label.grid(column=0, row=2, padx=10, pady=10)
-        self.datetime_entry = ttk.Entry(tab)
-        self.datetime_entry.grid(column=1, row=2, padx=10, pady=10)
-
-        schedule_button = ttk.Button(tab, text="Schedule Appointment", command=self.schedule_appointment)
-        schedule_button.grid(column=1, row=3, padx=10, pady=10)
-
-    def schedule_appointment(self):
-        #Schedule an appointment between a student and faculty.
-        student = self.student_entry.get()
-        faculty = self.faculty_entry.get()
-        datetime = self.datetime_entry.get()
-        if student and faculty and datetime:
-            self.appointments.schedule_appointment(student, faculty, datetime)
-            messagebox.showinfo("Success", "Appointment scheduled!")
-        else:
-            messagebox.showwarning("Warning", "All fields are required!")
+        # Add your appointment scheduling functionality here
 
     def create_notifications_tab(self, tab_control):
-        #Create 'Notifications' tab with functionality to send notifications.
+        # Create 'Notifications' tab for managing notifications.
         tab = ttk.Frame(tab_control)
         tab_control.add(tab, text="Notifications")
+        # Add your notifications functionality here
 
-        user_label = ttk.Label(tab, text="User:")
-        user_label.grid(column=0, row=0, padx=10, pady=10)
-        self.notification_user_entry = ttk.Entry(tab)
-        self.notification_user_entry.grid(column=1, row=0, padx=10, pady=10)
-
-        notification_label = ttk.Label(tab, text="Notification:")
-        notification_label.grid(column=0, row=1, padx=10, pady=10)
-        self.notification_entry = ttk.Entry(tab)
-        self.notification_entry.grid(column=1, row=1, padx=10, pady=10)
-
-        send_button = ttk.Button(tab, text="Send Notification", command=self.send_notification)
-        send_button.grid(column=1, row=2, padx=10, pady=10)
-
-    def send_notification(self):
-        #Send a notification to a user.
-        user = self.notification_user_entry.get()
-        notification = self.notification_entry.get()
-        if user and notification:
-            self.notifications.send_notification(user, notification)
-            messagebox.showinfo("Success", "Notification sent!")
-        else:
-            messagebox.showwarning("Warning", "All fields are required!")
-
-    def clear_frame(self):
-        # Clear all widgets from the root frame.
-        for widget in self.root.winfo_children():
-            widget.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
